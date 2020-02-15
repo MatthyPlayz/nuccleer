@@ -1,0 +1,16 @@
+[
+{
+  "modid": "nuccleer",
+  "name": "Nuccleer",
+  "description": "RF mod",
+  "version": "1.0",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["matthyno"],
+  "credits": "The internet",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
