@@ -35,15 +35,15 @@ import net.minecraft.block.state.IBlockState;
 import static java.lang.Thread.sleep;
 
 public class RTG extends Block implements ITileEntityProvider, IYottaStorage {
-    final int energya = 0;
+    protected int energy = 0;
     public RTG() {
         super(Material.ROCK);
+        this.energy = 0;
         new Thread(() -> {
             while(true) {
                 try {
                     sleep(10);
-                    this.energyStorage.addEnergyStored(1);
-                    System.out.println(getEnergyStored());
+                    this.energy += 1;
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -76,7 +76,7 @@ public class RTG extends Block implements ITileEntityProvider, IYottaStorage {
         if (!world.isRemote) {
             // We only count on the server side.
             if (side == state.getValue(FACING)) {
-                TextComponentTranslation component = new TextComponentTranslation("RF: " + ((DataTileEntity) te).energy);
+                TextComponentTranslation component = new TextComponentTranslation("RF: " + this.energy);
                 component.getStyle().setColor(TextFormatting.GREEN);
                 player.sendStatusMessage(component, true);
             }
@@ -152,8 +152,6 @@ public class RTG extends Block implements ITileEntityProvider, IYottaStorage {
 
     @Override
     public int getEnergyStored() {
-        TileEntity te = easyGetTE();
-        System.out.println(((DataTileEntity) te).energy);
-        return ((DataTileEntity) te).energy;
+        return this.energy;
     }
 }
