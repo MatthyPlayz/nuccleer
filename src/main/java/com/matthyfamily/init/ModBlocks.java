@@ -26,7 +26,7 @@ public class ModBlocks {
     @SubscribeEvent
     public static void registerBlocks(RegistryEvent.Register<Block> event) {
         event.getRegistry().register(new RTG());
-        GameRegistry.registerTileEntity(DataTileEntity.class, Reference.MODID + "_rtg");
+        GameRegistry.registerTileEntity(DataTileEntity.class, Reference.MODID + "_rtg"); //You might want to register tile entities in the RegistryEvent.Register<TileEntity> event
     }
 
     @SubscribeEvent
