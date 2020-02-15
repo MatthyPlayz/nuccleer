@@ -2,20 +2,18 @@ package com.matthyfamily.rtg;
 
 import com.matthyfamily.Reference;
 import com.matthyfamily.tileentity.DataTileEntity;
-import com.matthyfamily.yottaelectronvolts.IYottaStorage;
-import com.matthyfamily.yottaelectronvolts.YottaStorage;
 import net.minecraft.block.Block;
-import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyDirection;
 import net.minecraft.block.state.BlockStateContainer;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
@@ -27,28 +25,16 @@ import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.client.model.ModelLoader;
+import net.minecraftforge.energy.EnergyStorage;
+import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.block.state.IBlockState;
 
-import static java.lang.Thread.sleep;
-
-public class RTG extends Block implements ITileEntityProvider, IYottaStorage {
+public class RTG extends Block implements IEnergyStorage, ITickable {
     protected int energy = 0;
     public RTG() {
         super(Material.ROCK);
         this.energy = 0;
-        new Thread(() -> {
-            while(true) {
-                try {
-                    sleep(10);
-                    this.energy += 1;
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();
         setUnlocalizedName(Reference.MODID + ".rtg");
         setRegistryName("rtg");
     }
@@ -60,7 +46,6 @@ public class RTG extends Block implements ITileEntityProvider, IYottaStorage {
         ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(this), 0, new ModelResourceLocation(getRegistryName(), "inventory"));
     }
 
-    @Override
     public TileEntity createNewTileEntity(World worldIn, int meta) {
         return new DataTileEntity();
     }
@@ -76,7 +61,7 @@ public class RTG extends Block implements ITileEntityProvider, IYottaStorage {
         if (!world.isRemote) {
             // We only count on the server side.
             if (side == state.getValue(FACING)) {
-                TextComponentTranslation component = new TextComponentTranslation("RF: " + this.energy);
+                TextComponentTranslation component = new TextComponentTranslation("FE: " + this.energy);
                 component.getStyle().setColor(TextFormatting.GREEN);
                 player.sendStatusMessage(component, true);
             }
@@ -106,12 +91,7 @@ public class RTG extends Block implements ITileEntityProvider, IYottaStorage {
         return new BlockStateContainer(this, FACING);
     }
 
-    public YottaStorage energyStorage;
-
-    @Override
-    public int getMaxEnergyStorable() {
-        return 10 ^ 1000;
-    }
+    public EnergyStorage energyStorage;
 
     public boolean canConnectEnergy(EnumFacing from) {
         return false;
@@ -135,7 +115,7 @@ public class RTG extends Block implements ITileEntityProvider, IYottaStorage {
         return te;
     }
     @Override
-    public int receiveEnergy(int maxReceive) {
+    public int receiveEnergy(int maxReceive, boolean simulate) {
         TileEntity te = easyGetTE();
         //System.out.println("x: " + pos.getX() +" y: " + pos.getY() +" z: " + pos.getZ());
         //int energyReceived = Math.min(getMaxEnergyStored(from) - getEnergyStored(from), Math.min(getMaxReceive(), maxReceive));
@@ -144,14 +124,33 @@ public class RTG extends Block implements ITileEntityProvider, IYottaStorage {
         return energyReceived;
     }
 
-
     @Override
-    public int extractEnergy(int maxExtract) {
+    public int extractEnergy(int maxExtract, boolean simulate) {
         return 0;
     }
 
     @Override
     public int getEnergyStored() {
         return this.energy;
+    }
+
+    @Override
+    public int getMaxEnergyStored() {
+        return 100000;
+    }
+
+    @Override
+    public boolean canExtract() {
+        return true;
+    }
+
+    @Override
+    public boolean canReceive() {
+        return false;
+    }
+
+    @Override
+    public void update() {
+        this.energy++;
     }
 }
