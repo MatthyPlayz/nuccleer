@@ -63,7 +63,7 @@ public class DataTileEntity extends TileEntity implements IEnergyStorage, ITicka
         return amt;
     }
     private DataTileEntity getTE(World world, BlockPos pos) {
-        return (DataTileEntity) world.getTileEntity(pos);
+        return this; //You're literally in the TE class, you can just do return this.
     }
 
     public EnergyStorage energyStorage;
@@ -71,7 +71,7 @@ public class DataTileEntity extends TileEntity implements IEnergyStorage, ITicka
     public boolean canConnectEnergy(EnumFacing from) {
         return false;
     }
-    public DataTileEntity easyGetTE() {
+    public DataTileEntity easyGetTE() { //Doesn't look easy at all, might want to rename this to explain what it does or remove it altogether
         EntityPlayerSP player = Minecraft.getMinecraft().player;
         RayTraceResult raytraced = player.rayTrace(200, 1.0F);
         BlockPos pos = new BlockPos(new Vec3d(0, 0, 0));
@@ -86,8 +86,7 @@ public class DataTileEntity extends TileEntity implements IEnergyStorage, ITicka
         //System.out.println("x: " + pos.getX() +" y: " + pos.getY() +" z: " + pos.getZ());
         //int energyReceived = Math.min(getMaxEnergyStored(from) - getEnergyStored(from), Math.min(getMaxReceive(), maxReceive));
         int energyReceived = 1;
-        DataTileEntity te = this.getTE(world, pos);
-        return te;
+        return this; //You're literally in the TE class, you can just do return this
     }
     @Override
     public int receiveEnergy(int maxReceive, boolean simulate) {
@@ -95,7 +94,7 @@ public class DataTileEntity extends TileEntity implements IEnergyStorage, ITicka
         //System.out.println("x: " + pos.getX() +" y: " + pos.getY() +" z: " + pos.getZ());
         //int energyReceived = Math.min(getMaxEnergyStored(from) - getEnergyStored(from), Math.min(getMaxReceive(), maxReceive));
         int energyReceived = 1;
-        DataTileEntity TE = (DataTileEntity)world.getTileEntity(pos);
+        DataTileEntity TE = this; //You're literally in the TE class, you can just use this
         TE.energy += energyReceived;
         return energyReceived;
     }
@@ -126,8 +125,7 @@ public class DataTileEntity extends TileEntity implements IEnergyStorage, ITicka
     }
 
     public void update() {
-        DataTileEntity TE = (DataTileEntity)world.getTileEntity(pos);
-        TE.energy++;
+        this.energy++; //You're literally in the TE class, you can use this
     }
 }
 
