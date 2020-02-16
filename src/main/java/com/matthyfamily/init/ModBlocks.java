@@ -9,6 +9,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.model.ModelLoader;
+import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -25,12 +26,12 @@ public class ModBlocks {
 
     @SubscribeEvent
     public static void registerBlocks(RegistryEvent.Register<Block> event) {
+        GameRegistry.registerTileEntity(DataTileEntity.class, Reference.MODID + "_rtg");
         event.getRegistry().register(new RTG());
     }
-    @SubscribeEvent
+    /*@SubscribeEvent
     public static void registerTileEntities(net.minecraftforge.registries.IForgeRegistryEntry<net.minecraft.tileentity.TileEntity> event) {
-        GameRegistry.registerTileEntity(DataTileEntity.class, Reference.MODID + "_rtg");
-    }
+    }*/
 
     @SubscribeEvent
     public static void registerItemBlocks(RegistryEvent.Register<Item> event) {
@@ -44,5 +45,8 @@ public class ModBlocks {
 
     public static void registerRender(Item item) {
         ModelLoader.setCustomModelResourceLocation(item, 0, new ModelResourceLocation(item.getRegistryName(), "normal"));
+    }
+    @SubscribeEvent
+    public static void attachCapabilities(AttachCapabilitiesEvent event) {
     }
 }

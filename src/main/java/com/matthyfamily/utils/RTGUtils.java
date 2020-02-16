@@ -9,10 +9,10 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 public class RTGUtils {
-    public DataTileEntity getTE(World world, BlockPos pos) {
+    public static DataTileEntity getTE(World world, BlockPos pos) {
         return (DataTileEntity) world.getTileEntity(pos);
     }
-    public DataTileEntity getTENoArgs() {
+    public static DataTileEntity getTENoArgs() {
         // Get the player
         EntityPlayerSP player = Minecraft.getMinecraft().player;
         // Raytrace to get what block user is looking at
@@ -23,6 +23,6 @@ public class RTGUtils {
         pos = new BlockPos(raytraced.hitVec);
         // Get the world for finally getting the TileEntity
         World world = player.getEntityWorld();
-        return this.getTE(world, pos);
+        return getTE(world, pos);
     }
 }
