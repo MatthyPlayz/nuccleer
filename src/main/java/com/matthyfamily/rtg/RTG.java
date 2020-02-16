@@ -67,7 +67,7 @@ public class RTG extends Block {
     public TileEntity createNewTileEntity(World worldIn, int meta) {
         return new DataTileEntity();
     }
-    public DataTileEntity easyGetTE() {
+    public DataTileEntity easyGetTE() { //Doesn't look easy at all, either remove, rename or comment
         EntityPlayerSP player = Minecraft.getMinecraft().player;
         RayTraceResult raytraced = player.rayTrace(200, 1.0F);
         BlockPos pos = new BlockPos(new Vec3d(0, 0, 0));
@@ -91,11 +91,11 @@ public class RTG extends Block {
         if (!world.isRemote) {
             // We only count on the server side.
             if (side == state.getValue(FACING)) {
-                DataTileEntity TE = (DataTileEntity)world.getTileEntity(pos);
+                DataTileEntity TE = (DataTileEntity)world.getTileEntity(pos); //You've also got access to a getTE method
                 System.out.println(TE.energy);
                 TextComponentTranslation component = new TextComponentTranslation("FE: " + TE.energy);
                 component.getStyle().setColor(TextFormatting.GREEN);
-                player.sendStatusMessage(component, true);
+                player.sendStatusMessage(component, true); //After all this criticism, I will admit this is an amazing way of sending the client information. I'd just sync over the whole TE and then let the client read it for itself, this is probably way cleaner.
             }
         }
         // Return true also on the client to make sure that MC knows we handled this and will not try to place
