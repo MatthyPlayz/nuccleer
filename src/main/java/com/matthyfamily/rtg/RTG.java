@@ -3,6 +3,7 @@ package com.matthyfamily.rtg;
 import com.matthyfamily.Reference;
 import com.matthyfamily.tileentity.DataTileEntity;
 import net.minecraft.block.Block;
+import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyDirection;
 import net.minecraft.block.state.BlockStateContainer;
@@ -17,7 +18,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
-import net.minecraft.util.ITickable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
@@ -28,7 +28,8 @@ import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class RTG extends Block {
+public class RTG extends Block implements ITileEntityProvider {
+    public static final PropertyDirection FACING = PropertyDirection.create("facing", EnumFacing.Plane.HORIZONTAL);
     public RTG() {
         super(Material.ROCK);
         setUnlocalizedName(Reference.MODID + ".rtg");
@@ -56,8 +57,6 @@ public class RTG extends Block {
     protected BlockStateContainer createBlockState() {
         return new BlockStateContainer(this, FACING);
     }
-
-    public static final PropertyDirection FACING = PropertyDirection.create("facing", EnumFacing.Plane.HORIZONTAL);
 
     @SideOnly(Side.CLIENT)
     public void initModel() {
@@ -89,14 +88,14 @@ public class RTG extends Block {
     public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand,
                                     EnumFacing side, float hitX, float hitY, float hitZ) {
         if (!world.isRemote) {
-            // We only count on the server side.
-            if (side == state.getValue(FACING)) {
-                DataTileEntity TE = (DataTileEntity)world.getTileEntity(pos);
-                System.out.println(TE.energy);
-                TextComponentTranslation component = new TextComponentTranslation("FE: " + TE.energy);
-                component.getStyle().setColor(TextFormatting.GREEN);
-                player.sendStatusMessage(component, true);
-            }
+            // Get the tile entity
+            DataTileEntity TE = easyGetTE();
+            // Make the component that gets outputted when sendStatusMessage is ran
+            TextComponentTranslation component = new TextComponentTranslation("FE: " + TE.energy);
+            // Make the color GREEEEEEEEEN
+            component.getStyle().setColor(TextFormatting.GREEN);
+            // Send the player the message (the 2nd parameter makes it be on the action bar)
+            player.sendStatusMessage(component, true);
         }
         // Return true also on the client to make sure that MC knows we handled this and will not try to place
         // a block on the client

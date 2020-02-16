@@ -26,6 +26,9 @@ public class ModBlocks {
     @SubscribeEvent
     public static void registerBlocks(RegistryEvent.Register<Block> event) {
         event.getRegistry().register(new RTG());
+    }
+    @SubscribeEvent
+    public static void registerTileEntities(net.minecraftforge.registries.IForgeRegistryEntry<net.minecraft.tileentity.TileEntity> event) {
         GameRegistry.registerTileEntity(DataTileEntity.class, Reference.MODID + "_rtg");
     }
 
