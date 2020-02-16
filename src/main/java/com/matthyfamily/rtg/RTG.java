@@ -25,60 +25,26 @@ import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.client.model.ModelLoader;
-import net.minecraftforge.energy.EnergyStorage;
-import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class RTG extends Block implements IEnergyStorage, ITickable {
-    protected int energy = 0;
+public class RTG extends Block {
     public RTG() {
         super(Material.ROCK);
-        this.energy = 0;
         setUnlocalizedName(Reference.MODID + ".rtg");
         setRegistryName("rtg");
     }
-
-    public static final PropertyDirection FACING = PropertyDirection.create("facing", EnumFacing.Plane.HORIZONTAL);
-
-    @SideOnly(Side.CLIENT)
-    public void initModel() {
-        ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(this), 0, new ModelResourceLocation(getRegistryName(), "inventory"));
-    }
-
-    public TileEntity createNewTileEntity(World worldIn, int meta) {
-        return new DataTileEntity();
-    }
-
     private DataTileEntity getTE(World world, BlockPos pos) {
         return (DataTileEntity) world.getTileEntity(pos);
     }
-
     @Override
-    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand,
-                                    EnumFacing side, float hitX, float hitY, float hitZ) {
-        TileEntity te = easyGetTE();
-        if (!world.isRemote) {
-            // We only count on the server side.
-            if (side == state.getValue(FACING)) {
-                TextComponentTranslation component = new TextComponentTranslation("FE: " + this.energy);
-                component.getStyle().setColor(TextFormatting.GREEN);
-                player.sendStatusMessage(component, true);
-            }
-        }
-        // Return true also on the client to make sure that MC knows we handled this and will not try to place
-        // a block on the client
-        return true;
+    public IBlockState getStateFromMeta(int meta) {
+        return getDefaultState().withProperty(FACING, EnumFacing.getFront((meta & 3) + 2));
     }
 
     @Override
     public void onBlockPlacedBy(World world, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack) {
         world.setBlockState(pos, state.withProperty(FACING, placer.getHorizontalFacing().getOpposite()), 2);
-    }
-
-    @Override
-    public IBlockState getStateFromMeta(int meta) {
-        return getDefaultState().withProperty(FACING, EnumFacing.getFront((meta & 3) + 2));
     }
 
     @Override
@@ -91,10 +57,15 @@ public class RTG extends Block implements IEnergyStorage, ITickable {
         return new BlockStateContainer(this, FACING);
     }
 
-    public EnergyStorage energyStorage;
+    public static final PropertyDirection FACING = PropertyDirection.create("facing", EnumFacing.Plane.HORIZONTAL);
 
-    public boolean canConnectEnergy(EnumFacing from) {
-        return false;
+    @SideOnly(Side.CLIENT)
+    public void initModel() {
+        ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(this), 0, new ModelResourceLocation(getRegistryName(), "inventory"));
+    }
+
+    public TileEntity createNewTileEntity(World worldIn, int meta) {
+        return new DataTileEntity();
     }
     public DataTileEntity easyGetTE() {
         EntityPlayerSP player = Minecraft.getMinecraft().player;
@@ -115,42 +86,20 @@ public class RTG extends Block implements IEnergyStorage, ITickable {
         return te;
     }
     @Override
-    public int receiveEnergy(int maxReceive, boolean simulate) {
-        TileEntity te = easyGetTE();
-        //System.out.println("x: " + pos.getX() +" y: " + pos.getY() +" z: " + pos.getZ());
-        //int energyReceived = Math.min(getMaxEnergyStored(from) - getEnergyStored(from), Math.min(getMaxReceive(), maxReceive));
-        int energyReceived = 1;
-        ((DataTileEntity) te).energy += energyReceived;
-        return energyReceived;
-    }
-
-    @Override
-    public int extractEnergy(int maxExtract, boolean simulate) {
-        return 0;
-    }
-
-    @Override
-    public int getEnergyStored() {
-        return this.energy;
-    }
-
-    @Override
-    public int getMaxEnergyStored() {
-        return 100000;
-    }
-
-    @Override
-    public boolean canExtract() {
+    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand,
+                                    EnumFacing side, float hitX, float hitY, float hitZ) {
+        if (!world.isRemote) {
+            // We only count on the server side.
+            if (side == state.getValue(FACING)) {
+                DataTileEntity TE = (DataTileEntity)world.getTileEntity(pos);
+                System.out.println(TE.energy);
+                TextComponentTranslation component = new TextComponentTranslation("FE: " + TE.energy);
+                component.getStyle().setColor(TextFormatting.GREEN);
+                player.sendStatusMessage(component, true);
+            }
+        }
+        // Return true also on the client to make sure that MC knows we handled this and will not try to place
+        // a block on the client
         return true;
-    }
-
-    @Override
-    public boolean canReceive() {
-        return false;
-    }
-
-    @Override
-    public void update() {
-        this.energy++;
     }
 }
