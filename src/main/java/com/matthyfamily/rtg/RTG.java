@@ -21,20 +21,12 @@ import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.client.model.ModelLoader;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.CapabilityInject;
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.energy.CapabilityEnergy;
-import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 import static com.matthyfamily.utils.RTGUtils.getTENoArgs;
 
-public class RTG extends Block implements ITileEntityProvider, ICapabilityProvider {
+public class RTG extends Block implements ITileEntityProvider {
     public static final PropertyDirection FACING = PropertyDirection.create("facing", EnumFacing.Plane.HORIZONTAL);
     public RTG() {
         super(Material.ROCK);
@@ -88,22 +80,5 @@ public class RTG extends Block implements ITileEntityProvider, ICapabilityProvid
         // Return true also on the client to make sure that MC knows we handled this and will not try to place
         // a block on the client
         return true;
-    }
-    @CapabilityInject(IEnergyStorage.class)
-    Capability<IEnergyStorage> ITEM_HANDLER_CAPABILITY = null;
-
-    @Override
-    public boolean hasCapability(@Nonnull Capability<?> capability, @Nullable EnumFacing facing) {
-        return capability == CapabilityEnergy.ENERGY;
-    }
-
-    @Nullable
-    @Override
-    public <T> T getCapability(@Nonnull Capability<T> capability, @Nullable EnumFacing facing) {
-        if (capability == CapabilityEnergy.ENERGY) {
-            return CapabilityEnergy.ENERGY.cast(getTENoArgs());
-        }
-
-        return null;
     }
 }

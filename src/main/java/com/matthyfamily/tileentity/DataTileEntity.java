@@ -5,10 +5,17 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.CapabilityInject;
+import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.EnergyStorage;
 import net.minecraftforge.energy.IEnergyStorage;
 
-public class DataTileEntity extends TileEntity implements IEnergyStorage, ITickable {
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
+public class DataTileEntity extends TileEntity implements IEnergyStorage, ITickable, ICapabilityProvider {
 
     public int energy = 0;
     public static final PropertyDirection FACING = PropertyDirection.create("facing", EnumFacing.Plane.HORIZONTAL);
@@ -85,6 +92,23 @@ public class DataTileEntity extends TileEntity implements IEnergyStorage, ITicka
 
     public void update() {
         this.energy++;
+    }
+    @CapabilityInject(IEnergyStorage.class)
+    Capability<IEnergyStorage> ITEM_HANDLER_CAPABILITY = null;
+
+    @Override
+    public boolean hasCapability(@Nonnull Capability<?> capability, @Nullable EnumFacing facing) {
+        return capability == CapabilityEnergy.ENERGY;
+    }
+
+    @Nullable
+    @Override
+    public <T> T getCapability(@Nonnull Capability<T> capability, @Nullable EnumFacing facing) {
+        if (capability == CapabilityEnergy.ENERGY) {
+            return CapabilityEnergy.ENERGY.cast(this.ITEM_HANDLER_CAPABILITY.getDefaultInstance());
+        }
+
+        return null;
     }
 }
 
